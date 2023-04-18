@@ -26,7 +26,7 @@ const updateTask = (req, res) => {
                 res.status(200).json({...data })
             })
         )
-        .catch(err => res.status(err.status).json(err.msg))
+        .catch(err => res.status(err.status).json(err.message))
 
 
 
@@ -56,7 +56,7 @@ const getTaskByID = (req, res) => {
 
     getAuth(req, res)
         .then(data => res.status(200).json({ data }))
-        .catch(err => res.status(err.status).json(err.msg))
+        .catch(err => res.status(err.status).json(err.message))
 
 }
 const getAuth = (req, res) => {
