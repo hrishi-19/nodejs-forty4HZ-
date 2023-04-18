@@ -4,9 +4,9 @@ A backend service for task resource.
 
 
 ## Feautures
-User signup and login
-CRUD operations on Task Resources
-User authentication using JWT
+#### User signup and login
+#### CRUD operations on Task Resources
+#### User authentication using JWT
 
 ## SET UP
 Clone the repository to your local machine
