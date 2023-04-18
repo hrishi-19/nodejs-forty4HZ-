@@ -13,7 +13,7 @@ A backend service for task resource.
 ## SET UP
 Clone the repository to your local machine
 
- To install the depending run the command
+ To install the dependencies run the command
  ```bash 
     npm install
 ```
