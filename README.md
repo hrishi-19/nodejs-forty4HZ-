@@ -22,7 +22,9 @@ Clone the repository to your local machine
 
 ## To Run the project 
 Set up the congiguration to your database in the dbconfig.js file
+
 Store your env variables in .env file
+
 start your mysql server
 
 To start your nodejs server 
