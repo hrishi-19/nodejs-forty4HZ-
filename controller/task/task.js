@@ -7,6 +7,8 @@ const createTableTask = (req, res) => {
 
 }
 const addTask = (req, res) => {
+    const checkEmpty=req.body.title === undefined || req.body.description === undefined||req.body.title.length===0||req.body.description.length===0
+    if (checkEmpty) return res.status(400).json({ message: "title or description cannot be empty" })
     Task.insert(req.conn, req.body, req.user.user.uid, function (err, data) {
         if (err) return res.status(500).json({ ...err })
         data.message="Task added successfully"
