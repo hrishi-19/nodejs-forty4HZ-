@@ -61,7 +61,7 @@ const authenticateToken = (req, res, next) => {
     if (token == null) return res.status(401).json({ message: "Not authenticated" })
 
     JWT.verify(token, process.env.JWT_TOKEN, (err, user) => {
-        if (err) res.status(403).json({ message: "Invalid token" })
+        if (err) return res.status(403).json({ message: "Invalid token" })
         req.user = user
         next()
     })
