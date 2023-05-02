@@ -1,5 +1,5 @@
 const Task = require('../../model/tasks')
-const { setCache, clearCache } = require('../../utils/cache/redis')
+const { redisClient } = require('../../utils/cache/redis')
 const createTableTask = (req, res) => {
     Task.createTable(req.conn, function (err, data) {
         if (err) return res.status(500).json({ ...err })
@@ -7,77 +7,66 @@ const createTableTask = (req, res) => {
     })
 
 }
+
+
 const addTask = (req, res) => {
-    const checkEmpty=req.body.title === undefined || req.body.description === undefined||req.body.title.length===0||req.body.description.length===0
+    const checkEmpty = req.body.title === undefined || req.body.description === undefined || req.body.title.length === 0 || req.body.description.length === 0
     if (checkEmpty) return res.status(400).json({ message: "title or description cannot be empty" })
     Task.insert(req.conn, req.body, req.user.user.uid, function (err, data) {
         if (err) return res.status(500).json({ ...err })
-        clearCache(req.user.user.uid)
-        data.message="Task added successfully"
-        res.status(200).json({...data })
+        data.message = "Task added successfully"
+        res.status(200).json({ ...data })
     })
 
 }
 const updateTask = (req, res) => {
-    const data=req.body
-    const checkEmpty=data.title === undefined || data.description === undefined||data.title.length===0||data.description.length===0
+    const data = req.body
+    const checkEmpty = data.title === undefined || data.description === undefined || data.title.length === 0 || data.description.length === 0
     if (checkEmpty) return res.status(400).json({ message: "title or description cannot be empty" })
-    getAuth(req, res)
-        .then(data =>
-            Task.update(req.conn, req.params.tid, req.body, function (err, data) {
+  
+            Task.update(req.conn,req.user.user, req.params.tid, req.body, function (err, data) {
                 if (err) return res.status(500).json({ ...err })
-                clearCache(req.user.user.uid)
-                data.message=`Task with id ${req.params.tid} updated successfully`
-                res.status(200).json({...data })
+                redisClient.del(req.params.tid.toString())
+                data.message = `Task with id ${req.params.tid} updated successfully`
+                res.status(200).json({ ...data })
             })
-        )
-        .catch(err => res.status(err.status).json(err.message))
-
+        
 
 
 }
 const deleteTask = (req, res) => {
 
-    getAuth(req, res)
-        .then(data =>
-            Task.delete(req.conn, req.params.tid, function (err, data) {
-                if (err) return res.status(500).json({ ...err })
-                clearCache(req.user.user.uid)
-                data.message=`Task with id ${req.params.tid} deleted successfully`
-               
-                res.status(200).json({...data })
+            Task.delete(req.conn, req.user.user,req.params.tid, function (err, data) {
+                  if (err) return res.status(500).json({ ...err })
+                   redisClient.del(req.params.tid.toString())
+                    data.message = `Task with id ${req.params.tid} deleted successfully`
+
+                     res.status(200).json({ ...data })
+                
             })
-        )
-        .catch(err => res.status(err.status).json(err.message))
+      
 
 }
 const getPosts = (req, res) => {
     Task.getAll(req.conn, function (err, data) {
         if (err) return res.status(500).json({ ...err })
         const userTask = data.filter(item => item.uid === req.user.user.uid)
-        setCache(req.user.user.uid,userTask)
         res.status(200).json({ userTask })
     })
 
 }
 const getTaskByID = (req, res) => {
-
-    getAuth(req, res)
-        .then(data => res.status(200).json({ data }))
-        .catch(err => res.status(err.status).json(err.message))
-
-}
-const getAuth = (req, res) => {
-    const promise = new Promise(function (resolve, reject) {
-        Task.getById(req.conn, req.params.tid, function (err, data) {
-            if (err) return reject({ status: 500, msg: err })
-            if (data.length == 0) return reject({ status: 404, message: "TASK NOT FOUND" })
-            if (req.user.user.uid !== data[0].uid) return reject({ status: 403, message: "ACCESS DENIED" })
-            return resolve(data)
-        })
-
+    Task.getById(req.conn,req.user.user,req.params.tid,function(err,data){
+        if (err) return res.status(500).json({ ...err })
+        if(data.length>0)redisClient.set(req.params.tid.toString(),JSON.stringify(data[0]))
+            
+       
+        res.status(200).json({ data })
     })
-    return promise
+
+    
+
 }
+
 
 module.exports = { getPosts, createTableTask, addTask, updateTask, deleteTask, getTaskByID }

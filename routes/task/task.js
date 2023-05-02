@@ -7,7 +7,7 @@ const router = require('express').Router()
 
 //task routes
 router.get('/createtabletask', createTableTask)
-router.get('/', authenticateToken,getCache,getPosts)
+router.get('/', authenticateToken,getPosts)
 router.get('/:tid',authenticateToken,getTaskByID)
 router.post('/', authenticateToken, addTask)
 router.put('/:tid', authenticateToken, updateTask)

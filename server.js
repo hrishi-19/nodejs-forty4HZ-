@@ -23,7 +23,7 @@ app.use(express.urlencoded({ extended: true }))
 //routes
 app.use('/api/user', userRoute)
 app.use('/api/task', taskRoute)
-app.get('*',(req,res)=>{
+app.use((req,res)=>{
     res.status(404).json({msg:"PAGE NOT FOUND"})
 })
 

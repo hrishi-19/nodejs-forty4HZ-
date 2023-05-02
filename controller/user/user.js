@@ -1,6 +1,7 @@
 const User = require('../../model/user')
 const crypto = require('crypto-js')
 const JWT = require('jsonwebtoken')
+const { setCache } = require('../../utils/cache/redis')
 
 
 const createTableUser = (req, res) => {

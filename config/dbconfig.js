@@ -1,9 +1,12 @@
-const mysqli=require('mysql')
+const mysqli=require('mysql2')
 
 module.exports=mysqli.createConnection({
     host:'localhost',
     user:'root',
-    password:'',
-    database:'task_api'
+    password:'Qwerty1234567',
+    port: 3306,
+    ssl: {
+        rejectUnauthorized: false
+    }
     
 })
