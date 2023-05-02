@@ -1,4 +1,5 @@
 const Task = require('../../model/tasks')
+const { setCache, clearCache } = require('../../utils/cache/redis')
 const createTableTask = (req, res) => {
     Task.createTable(req.conn, function (err, data) {
         if (err) return res.status(500).json({ ...err })
@@ -11,6 +12,7 @@ const addTask = (req, res) => {
     if (checkEmpty) return res.status(400).json({ message: "title or description cannot be empty" })
     Task.insert(req.conn, req.body, req.user.user.uid, function (err, data) {
         if (err) return res.status(500).json({ ...err })
+        clearCache(req.user.user.uid)
         data.message="Task added successfully"
         res.status(200).json({...data })
     })
@@ -24,6 +26,7 @@ const updateTask = (req, res) => {
         .then(data =>
             Task.update(req.conn, req.params.tid, req.body, function (err, data) {
                 if (err) return res.status(500).json({ ...err })
+                clearCache(req.user.user.uid)
                 data.message=`Task with id ${req.params.tid} updated successfully`
                 res.status(200).json({...data })
             })
@@ -39,7 +42,9 @@ const deleteTask = (req, res) => {
         .then(data =>
             Task.delete(req.conn, req.params.tid, function (err, data) {
                 if (err) return res.status(500).json({ ...err })
+                clearCache(req.user.user.uid)
                 data.message=`Task with id ${req.params.tid} deleted successfully`
+               
                 res.status(200).json({...data })
             })
         )
@@ -50,6 +55,7 @@ const getPosts = (req, res) => {
     Task.getAll(req.conn, function (err, data) {
         if (err) return res.status(500).json({ ...err })
         const userTask = data.filter(item => item.uid === req.user.user.uid)
+        setCache(req.user.user.uid,userTask)
         res.status(200).json({ userTask })
     })
 

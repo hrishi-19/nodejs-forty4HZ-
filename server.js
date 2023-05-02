@@ -1,15 +1,20 @@
 const express = require('express')
 const taskRoute = require('./routes/task/task')
 const userRoute = require('./routes/user/user')
+const {redisClient}=require('./utils/cache/redis')
 require('dotenv').config()
 const conn = require('./config/dbconfig')
 const app = express()
 
 
+
+
 app.use(function (req, res, next) {
     req.conn = conn
+    redisClient
     next()
 })
+
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
